@@ -1,0 +1,176 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - May Day High School Virtual Art Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Open Sans', sans-serif; background: #f5f5f5; min-height: 100vh; color: #333; }
+        .header { background: linear-gradient(90deg, #1e3a5f, #2d5a87); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.2); flex-wrap: wrap; gap: 10px; }
+        .header h1 { font-family: 'Playfair Display', serif; color: #f4c430; font-size: 1.5rem; }
+        .header-nav { display: flex; gap: 10px; flex-wrap: wrap; }
+        .header-nav a { color: white; text-decoration: none; padding: 8px 15px; border-radius: 20px; background: rgba(255,255,255,0.1); transition: all 0.3s; font-size: 0.9rem; }
+        .header-nav a:hover { background: #f4c430; color: #1e3a5f; }
+        .main-container { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        .tab { padding: 12px 25px; background: white; border: 2px solid #1e3a5f; border-radius: 25px; cursor: pointer; font-weight: 600; color: #1e3a5f; transition: all 0.3s; }
+        .tab:hover, .tab.active { background: #1e3a5f; color: white; }
+        .tab.past { border-color: #f4c430; color: #b8860b; }
+        .tab.past:hover, .tab.past.active { background: #f4c430; color: #1e3a5f; }
+        .section-title { font-family: 'Playfair Display', serif; color: #1e3a5f; font-size: 2rem; margin-bottom: 10px; text-align: center; }
+        .section-subtitle { text-align: center; color: #666; margin-bottom: 30px; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+        .artist-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; }
+        .artist-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(30, 58, 95, 0.2); }
+        .artist-photo-container { position: relative; height: 250px; overflow: hidden; background: #e0e0e0; }
+        .artist-photo { width: 100%; height: 100%; object-fit: cover; }
+        .artist-badge { position: absolute; top: 10px; right: 10px; padding: 5px 12px; border-radius: 15px; font-size: 0.75rem; font-weight: 600; }
+        .badge-current { background: #1e3a5f; color: white; }
+        .badge-past { background: #f4c430; color: #1e3a5f; }
+        .csec-badge { position: absolute; bottom: 10px; left: 10px; background: #28a745; color: white; padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; font-weight: 600; }
+        .artist-info { padding: 20px; }
+        .artist-name { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: #1e3a5f; margin-bottom: 8px; }
+        .artist-forms { color: #666; font-size: 0.9rem; margin-bottom: 15px; }
+        .artist-forms span { display: inline-block; background: #e8f4f8; padding: 3px 10px; border-radius: 10px; margin: 2px; font-size: 0.8rem; }
+        .audio-player { background: #f8f9fa; border-radius: 10px; padding: 12px; margin-top: 15px; }
+        .audio-label { font-size: 0.8rem; color: #666; margin-bottom: 8px; }
+        .audio-player audio { width: 100%; height: 35px; }
+        .view-artworks-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #1e3a5f, #2d5a87); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 15px; transition: background 0.3s; }
+        .view-artworks-btn:hover { background: linear-gradient(135deg, #2d5a87, #1e3a5f); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; overflow-y: auto; }
+        .modal.active { display: flex; justify-content: center; align-items: flex-start; padding: 50px 20px; }
+        .modal-content { background: white; border-radius: 20px; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { position: sticky; top: 0; background: linear-gradient(90deg, #1e3a5f, #2d5a87); padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { color: #f4c430; font-family: 'Playfair Display', serif; }
+        .close-btn { background: rgba(255,255,255,0.2); border: none; color: white; font-size: 1.5rem; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; }
+        .modal-body { padding: 25px; }
+        .artist-statement { background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #f4c430; }
+        .artist-statement h4 { color: #1e3a5f; margin-bottom: 10px; }
+        .artworks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .artwork-item { background: #f8f9fa; border-radius: 10px; overflow: hidden; }
+        .artwork-item img { width: 100%; height: 200px; object-fit: cover; cursor: pointer; transition: transform 0.3s; }
+        .artwork-item img:hover { transform: scale(1.05); }
+        .artwork-info { padding: 15px; }
+        .artwork-title { font-weight: 600; color: #1e3a5f; margin-bottom: 5px; }
+        .artwork-desc { font-size: 0.85rem; color: #666; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #666; }
+        .empty-state .icon { font-size: 4rem; margin-bottom: 20px; }
+        .gallery-section { display: none; }
+        .gallery-section.active { display: block; }
+        .footer { text-align: center; padding: 30px; background: #1e3a5f; color: rgba(255,255,255,0.7); margin-top: 50px; }
+        .footer a { color: #f4c430; text-decoration: none; }
+        .image-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1100; justify-content: center; align-items: center; }
+        .image-viewer.active { display: flex; }
+        .image-viewer img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        .image-viewer .close-btn { position: absolute; top: 20px; right: 20px; }
+        @media (max-width: 768px) { .header { flex-direction: column; text-align: center; } .gallery-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>May Day High School Gallery</h1>
+        <nav class="header-nav">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="exit.html">Exit & Feedback</a>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <div class="tabs">
+            <button class="tab active" onclick="showSection('current')">Current Students</button>
+            <button class="tab past" onclick="showSection('past')">Past Students & CSEC</button>
+        </div>
+
+        <section id="current-section" class="gallery-section active">
+            <h2 class="section-title">Current Student Artists</h2>
+            <p class="section-subtitle">Explore the creative works of our talented current students. Click on an artist to view their portfolio and hear their artist statement.</p>
+            <div class="gallery-grid" id="currentArtists"></div>
+        </section>
+
+        <section id="past-section" class="gallery-section">
+            <h2 class="section-title">Past Student Artists</h2>
+            <p class="section-subtitle">Celebrating the achievements of our past students and their CSEC examination success.</p>
+            <div class="gallery-grid" id="pastArtists"></div>
+        </section>
+    </main>
+
+    <div class="modal" id="artistModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalArtistName">Artist Name</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="artist-statement"><h4>Artist Statement</h4><p id="modalStatementText"></p></div>
+                <div class="audio-player" id="modalAudioContainer"><div class="audio-label">🎧 Listen to Artist Statement</div><audio controls id="modalAudio"></audio></div>
+                <h3 style="margin: 25px 0 15px; color: #1e3a5f;">Artworks</h3>
+                <div class="artworks-grid" id="modalArtworks"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="image-viewer" id="imageViewer">
+        <button class="close-btn" onclick="closeImageViewer()">&times;</button>
+        <img id="viewerImage" src="" alt="Artwork">
+    </div>
+
+    <footer class="footer">
+        <p>© 2024 May Day High School Visual Arts Department</p>
+        <p>Teachers: <strong>Mr. Robert Patmore</strong> & <strong>Ms. Ashley Chambers</strong></p>
+    </footer>
+
+    <script>
+        const students = JSON.parse(localStorage.getItem('maydayGalleryData'))?.students || [
+            { id: 1, name: "Sample Student", isPast: false, expressiveForms: ["Painting", "Drawing"], photo: "https://via.placeholder.com/400x300/1e3a5f/ffffff?text=Student+Photo", artistStatement: "Add students via the Manager Dashboard.", audioStatement: "", csecScore: null, artworks: [] }
+        ];
+
+        function renderArtists() {
+            const currentContainer = document.getElementById('currentArtists');
+            const pastContainer = document.getElementById('pastArtists');
+            const currentStudents = students.filter(s => !s.isPast);
+            const pastStudents = students.filter(s => s.isPast);
+            currentContainer.innerHTML = currentStudents.length ? currentStudents.map(s => createArtistCard(s)).join('') : '<div class="empty-state"><div class="icon">🎨</div><h3>No Current Students Yet</h3><p>Add students via the Manager Dashboard.</p></div>';
+            pastContainer.innerHTML = pastStudents.length ? pastStudents.map(s => createArtistCard(s)).join('') : '<div class="empty-state"><div class="icon">🏆</div><h3>No Past Students Yet</h3><p>Add past students via the Manager Dashboard.</p></div>';
+        }
+
+        function createArtistCard(student) {
+            const formsHtml = student.expressiveForms?.map(f => `<span>${f}</span>`).join('') || '';
+            const audioHtml = student.audioStatement ? `<div class="audio-player"><div class="audio-label">🎧 Artist Statement</div><audio controls src="${student.audioStatement}"></audio></div>` : '';
+            const csecBadge = student.csecScore ? `<span class="csec-badge">CSEC: ${student.csecScore}</span>` : '';
+            return `<div class="artist-card"><div class="artist-photo-container"><img src="${student.photo || 'https://via.placeholder.com/400x300/1e3a5f/ffffff?text=Photo'}" alt="${student.name}" class="artist-photo"><span class="artist-badge ${student.isPast ? 'badge-past' : 'badge-current'}">${student.isPast ? 'Past Student' : 'Current'}</span>${csecBadge}</div><div class="artist-info"><h3 class="artist-name">${student.name}</h3><div class="artist-forms">${formsHtml}</div>${audioHtml}<button class="view-artworks-btn" onclick="openArtistModal(${student.id})">View Portfolio</button></div></div>`;
+        }
+
+        function openArtistModal(studentId) {
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            document.getElementById('modalArtistName').textContent = student.name;
+            document.getElementById('modalStatementText').textContent = student.artistStatement || 'No artist statement available.';
+            const audioContainer = document.getElementById('modalAudioContainer');
+            const audio = document.getElementById('modalAudio');
+            if (student.audioStatement) { audio.src = student.audioStatement; audioContainer.style.display = 'block'; } else { audioContainer.style.display = 'none'; }
+            const artworksContainer = document.getElementById('modalArtworks');
+            artworksContainer.innerHTML = student.artworks?.length ? student.artworks.map(a => `<div class="artwork-item"><img src="${a.image}" alt="${a.title}" onclick="viewImage('${a.image}')"><div class="artwork-info"><div class="artwork-title">${a.title}</div><div class="artwork-desc">${a.desc || ''}</div></div></div>`).join('') : '<p style="color: #666;">No artworks available yet.</p>';
+            document.getElementById('artistModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() { document.getElementById('artistModal').classList.remove('active'); document.body.style.overflow = 'auto'; document.getElementById('modalAudio').pause(); }
+        function viewImage(src) { document.getElementById('viewerImage').src = src; document.getElementById('imageViewer').classList.add('active'); }
+        function closeImageViewer() { document.getElementById('imageViewer').classList.remove('active'); }
+        function showSection(section) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('current-section').classList.remove('active');
+            document.getElementById('past-section').classList.remove('active');
+            document.getElementById(`${section}-section`).classList.add('active');
+        }
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeModal(); closeImageViewer(); } });
+        renderArtists();
+    </script>
+</body>
+</html>
+```
